@@ -1,0 +1,71 @@
+//多线程分别去执行三个方法，
+// 对应的是分别输出1，2，3，必须保证打印的顺序是123...
+
+//  版本一： 虽然 n 不为 0，但不让出 CPU，导致 n 无法及时变化
+public class OneTwoThree {
+    private static class Foo {
+        private int n = 0; //标记符
+        public void One(){
+            synchronized (this){
+                if(n!=0){
+                    return;
+                }
+                n=1;
+                System.out.println("one");
+            }
+        }
+
+        public void Two(){
+            synchronized (this){
+                if(n!=1){
+                    return;
+                }
+                n=2;
+                System.out.println("two");
+            }
+        }
+        public void Three(){
+            synchronized (this){
+                if(n!=2){
+                    return;
+                }
+                n=0;
+                System.out.println("Three");
+            }
+        }
+    }
+    public static Foo foo=new Foo();
+    private static class OneThread extends Thread{
+        @Override
+        public void run() {
+            while (true){
+                foo.One();
+            }
+        }
+    }
+    private static class TwoThread extends Thread{
+        @Override
+        public void run() {
+            while (true){
+                foo.Two();
+            }
+        }
+    }
+    private static class ThreeThread extends Thread{
+        @Override
+        public void run() {
+            while (true){
+                foo.Three();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Thread thread1=new OneThread();
+        Thread thread2=new TwoThread();
+        Thread thread3=new ThreeThread();
+        thread1.start();
+        thread2.start();
+        thread3.start();
+    }
+}
