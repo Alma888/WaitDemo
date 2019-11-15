@@ -1,3 +1,5 @@
+版本二：
+
 public class OneTwoThree1 {
     //减少了锁的开销
     private static class Foo {
