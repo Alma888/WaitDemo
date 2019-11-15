@@ -1,0 +1,101 @@
+//版本四：
+
+public class OneTwoThree3 {
+    // 条件不满足，让出 CPU，并且不再参加 CPU 的争夺
+    private static class Foo {
+        private int n = 0; //标记符
+        public void one() throws InterruptedException {
+            if(n!=0) {
+                synchronized (this) {
+                    wait();
+                }
+                return;
+            }
+            // 两句话的次序不能颠倒
+            System.out.println("one");
+            n=1;
+
+            synchronized (this){
+                notifyAll();//唤醒所有处于等待集的线程
+            }
+        }
+
+        public void two() throws InterruptedException {
+            if(n!=1) {
+                synchronized (this) {
+                    wait();
+                }
+                return;
+            }
+            // 两句话的次序不能颠倒
+            System.out.println("two");
+            n=2;
+
+            synchronized (this){
+                notifyAll();
+            }
+        }
+        public void three() throws InterruptedException {
+            if(n!=2) {
+                synchronized (this) {
+                    wait();
+                }
+                return;
+            }
+            // 两句话的次序不能颠倒
+            System.out.println("three");
+            n=0;
+
+            synchronized (this){
+                notifyAll();
+            }
+        }
+    }
+    public static Foo foo=new Foo();
+    private static class OneThread extends Thread{
+        @Override
+        public void run() {
+            while (true){
+                try {
+                    foo.one();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    private static class TwoThread extends Thread{
+        @Override
+        public void run() {
+            while (true){
+                try {
+                    foo.two();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    private static class ThreeThread extends Thread{
+        @Override
+        public void run() {
+            while (true){
+                try {
+                    foo.three();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Thread thread1=new OneThread();
+        Thread thread2=new TwoThread();
+        Thread thread3=new ThreeThread();
+        thread1.start();
+        thread2.start();
+        thread3.start();
+    }
+
+}
