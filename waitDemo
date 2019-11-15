@@ -1,0 +1,38 @@
+import java.util.Scanner;
+//等待集 的演示：每个对象都有一个等待集
+public class WaitDemo {
+    private static Object object=new Object();
+
+    private static class A extends Thread{
+        @Override
+        public void run() {
+            for(int i=0;i<10;i++){
+                System.out.println(i);
+            }
+            synchronized (object){
+                try {
+                    object.wait();//进入等待集，等待另一个线程的执行和唤醒(notify())它
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            //被唤醒后，执行下面的代码，打印100到110
+            for(int j=100;j<110;j++){
+                System.out.println(j);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Thread thread=new A();
+        thread.start();
+
+        Scanner scanner=new Scanner(System.in);
+        System.out.println("我不输入，A绝对不会动");
+        scanner.nextLine();//随便输入一个字符
+        //到了主线程抢锁，主线程里面调用了notify方法，唤醒了A线程
+        synchronized (object){
+            object.notify();
+        }
+    }
+}
