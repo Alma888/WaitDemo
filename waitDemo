@@ -1,5 +1,7 @@
 import java.util.Scanner;
+
 //等待集 的演示：每个对象都有一个等待集
+
 public class WaitDemo {
     private static Object object=new Object();
 
